@@ -11,7 +11,6 @@ describe 'galaxy' do
         context "galaxy class without any parameters" do
           it { is_expected.to compile.with_all_deps }
 
-          it { is_expected.to contain_class('galaxy::params') }
           it { is_expected.to contain_class('galaxy::install').that_comes_before('Class[galaxy::config]') }
           it { is_expected.to contain_class('galaxy::config') }
           it { is_expected.to contain_class('galaxy::service').that_subscribes_to('Class[galaxy::config]') }

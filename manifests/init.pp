@@ -1,7 +1,7 @@
 # Class: galaxy
 # ===========================
 #
-# Full description of class galaxy here.
+# This is the main public class for the galaxy module.
 #
 # Parameters
 # ----------
@@ -12,12 +12,28 @@
 #
 class galaxy (
   # parameters for the class will be here
-) inherits ::galaxy::params {
+) {
 
   # validate parameters here
 
-  class { '::galaxy::install': }
-  -> class { '::galaxy::config': }
-  ~> class { '::galaxy::service': }
-  -> Class['::galaxy']
+
+
+  case $::osfamily {
+    'RedHat', 'Amazon': {
+      case $::operatingsystemmajrelease {
+        '7': {
+          class { '::galaxy::install': }
+          -> class { '::galaxy::config': }
+          ~> class { '::galaxy::service': }
+          -> Class['::galaxy']
+        }
+        default: {
+          fail("unsupported operating system and release hit in galaxy::params:  ${::operatingsystem} ${::operatingsystemmajrelease}")
+        }
+      }
+    }
+    default: {
+      fail("${::operatingsystem} not supported")
+    }
+  }
 }

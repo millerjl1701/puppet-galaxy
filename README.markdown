@@ -63,7 +63,7 @@ The following parameters are available in the `::galaxy` class:
 
 ## Limitations
 
-This module is tested for RHEL/CentOS 7 and the 17.05 version of galaxy.
+This module is tested for RHEL/CentOS 7 and the 17.05 version of galaxy. The module is setup with hiera 5 data usage so Puppet 4.9 or higher is neeed.
 
 ## Development
 

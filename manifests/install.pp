@@ -1,6 +1,6 @@
 # == Class galaxy::install
 #
-# This class is called from galaxy for install.
+# This private class is called from galaxy for install.
 #
 class galaxy::install {
 

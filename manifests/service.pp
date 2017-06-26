@@ -1,7 +1,7 @@
 # == Class galaxy::service
 #
-# This class is meant to be called from galaxy.
-# It ensure the service is running.
+# This private class is meant to be called from galaxy.
+# It ensures the appropriate services are running.
 #
 class galaxy::service {
 

@@ -4,20 +4,34 @@
 # need to occur prior to the galaxy installation.
 #
 class galaxy::preinstall {
-  user { $::galaxy::galaxy_code_owner:
-    ensure     => present,
-    comment    => 'Galaxy Code',
-    home       => '/opt/galaxy',
-    managehome => true,
-    system     => true,
+  if $::galaxy::galaxy_use_separate_users {
+    user { $::galaxy::galaxy_code_owner:
+      ensure     => present,
+      comment    => 'Galaxy Code',
+      home       => $::galaxy::galaxy_base_dir,
+      managehome => true,
+      system     => true,
+    }
+    user { $::galaxy::galaxy_runtime_user:
+      ensure     => present,
+      comment    => 'Galaxy Server',
+      home       => $::galaxy::galaxy_runtime_dir,
+      managehome => true,
+      system     => true,
+    }
   }
-
-  user { $::galaxy::galaxy_runtime_user:
-    ensure     => present,
-    comment    => 'Galaxy Server',
-    home       => '/var/opt/galaxy',
-    managehome => true,
-    system     => true,
+  else {
+    user { $::galaxy::galaxy_runtime_user:
+      ensure     => present,
+      comment    => 'Galaxy Server',
+      home       => $::galaxy::galaxy_base_dir,
+      managehome => true,
+      system     => true,
+    }
+    file { $::galaxy::galaxy_runtime_dir:
+      ensure => directory,
+      owner  => $::galaxy::galaxy_runtime_user,
+    }
   }
 
   if $::galaxy::galaxy_manage_git {

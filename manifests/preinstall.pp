@@ -10,15 +10,29 @@ class galaxy::preinstall {
       ensure     => present,
       comment    => 'Galaxy Code',
       home       => $::galaxy::galaxy_base_dir,
-      managehome => true,
+      managehome => false,
       system     => true,
+    }
+    file { $::galaxy::galaxy_base_dir:
+      ensure  => directory,
+      owner   => $::galaxy::galaxy_code_owner,
+      group   => $::galaxy::galaxy_code_owner,
+      mode    => '0755',
+      require => User[$::galaxy::galaxy_code_owner],
     }
     user { $::galaxy::galaxy_runtime_user:
       ensure     => present,
       comment    => 'Galaxy Server',
       home       => $::galaxy::galaxy_runtime_dir,
-      managehome => true,
+      managehome => false,
       system     => true,
+    }
+    file {  $::galaxy::galaxy_runtime_dir:
+      ensure  => directory,
+      owner   => $::galaxy::galaxy_runtime_user,
+      group   => $::galaxy::galaxy_runtime_user,
+      mode    => '0755',
+      require => User[$::galaxy::galaxy_runtime_user],
     }
   }
   else {
@@ -26,12 +40,15 @@ class galaxy::preinstall {
       ensure     => present,
       comment    => 'Galaxy Server',
       home       => $::galaxy::galaxy_base_dir,
-      managehome => true,
+      managehome => false,
       system     => true,
     }
-    file { $::galaxy::galaxy_runtime_dir:
-      ensure => directory,
-      owner  => $::galaxy::galaxy_runtime_user,
+    file { [ $::galaxy::galaxy_base_dir, $::galaxy::galaxy_runtime_dir ]:
+      ensure  => directory,
+      owner   => $::galaxy::galaxy_runtime_user,
+      group   => $::galaxy::galaxy_runtime_user,
+      mode    => '0755',
+      require => User[$::galaxy::galaxy_runtime_user],
     }
   }
 

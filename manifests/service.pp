@@ -1,3 +1,4 @@
+# @api private
 # == Class galaxy::service
 #
 # This private class is meant to be called from galaxy.

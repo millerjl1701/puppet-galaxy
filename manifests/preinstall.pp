@@ -1,3 +1,4 @@
+# @api private
 # == Class galaxy::preinstall
 #
 # This private class is called from galaxy for install and handles tasks that

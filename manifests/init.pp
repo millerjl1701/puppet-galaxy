@@ -1,4 +1,3 @@
-# @api private
 # Class: galaxy
 # ===========================
 #

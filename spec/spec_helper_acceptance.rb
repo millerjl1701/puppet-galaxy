@@ -17,6 +17,7 @@ RSpec.configure do |c|
     puppet_module_install(:source => proj_root, :module_name => 'galaxy')
     hosts.each do |host|
       on host, puppet('module', 'install', 'puppetlabs-stdlib'), { :acceptable_exit_codes => [0,1] }
+      on host, puppet('module', 'install', 'puppetlabs-vcsrepo'), { :acceptable_exit_codes => [0,1] }
       on host, puppet('module', 'install', 'stahnma-epel'), { :acceptable_exit_codes => [0,1] }
       on host, puppet('module', 'install', 'stankevich-python'), { :acceptable_exit_codes => [0,1] }
     end

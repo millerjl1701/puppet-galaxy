@@ -7,13 +7,15 @@
 # @param galaxy_code_owner [String] Name of the user for that will own the galaxy code directory. Default value: gxcode
 # @param galaxy_commit_id [String] The release tag to use for cloning the Galaxy git repository. This can be a branch name, commit SHA, or tag. Default: release_17.05
 # @param galaxy_manage_git [Boolean] Whether to manage the git package resource. Default value: true
-# @param galaxy_manage_venv [Boolean] Whether to manage creation of the python 2.7 virtual environment for galaxy. Default value: true
+# @param galaxy_manage_venv [Boolean] Whether to manage creation of the python 2.7 virtual environment for Galaxy. Default value: true
 # @param galaxy_repo_url [String] URL of the Galaxy git repository to clone. Default: https://github.com/galaxyproject/galaxy.git
+# @param galaxy_requirements_file [Stdlib::Absolutepath] Path to the requirements file for pip. Default value: /opt/galaxy/server/lib/galaxy/dependencies/pinned-requirements.txt
 # @param galaxy_runtime_dir [Stdlib::Absolutepath] Directory for runtime files for the galaxy server. Default value: /var/opt/galaxy
 # @param galaxy_runtime_user [String] User account name that is the galaxy runtime user. Default value: galaxy
 # @param galaxy_server_dir [Stdlib::Absolutepath] Directory for the galaxy git repository code base to be cloned into. Default value: /opt/galaxy/server
 # @param galaxy_use_separate_users [Boolean] Whether to use separate user accounts for the galaxy code directory and the galaxy runtime. Default value: true
 # @param galaxy_venv_dir [Stdlib::Absolutepath] Directory where the galaxy python virtual environment lives. Default value: /opt/galaxy/server/.venv
+# @param galaxy_wheels_repo_url [String] URL of the Galaxy wheel repository. Default value: https://wheels.galaxyproject.org/
 # @param git_package_name [String] Specifies the name of the git package to manage. Default value: git
 #
 class galaxy (
@@ -34,6 +36,7 @@ class galaxy (
   String                $galaxy_runtime_user         = 'galaxy',
   String                $galaxy_commit_id            = 'release_17.05',
   String                $galaxy_repo_url             = 'https://github.com/galaxyproject/galaxy.git',
+  String                $galaxy_wheels_repo_url      = 'https://wheels.galaxyproject.org/',
   Boolean               $galaxy_manage_git           = true,
   String                $git_package_name            = 'git',
   Boolean               $galaxy_manage_venv          = true,
@@ -53,6 +56,7 @@ class galaxy (
         '7': {
           class { '::galaxy::preinstall': }
           -> class { '::galaxy::install': }
+          -> class { '::galaxy::postinstall': }
           -> class { '::galaxy::config': }
           ~> class { '::galaxy::service': }
           -> Class['::galaxy']

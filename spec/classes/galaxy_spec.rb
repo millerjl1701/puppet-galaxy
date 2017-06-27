@@ -13,7 +13,8 @@ describe 'galaxy' do
 
           it { is_expected.to contain_class('galaxy') }
           it { is_expected.to contain_class('galaxy::preinstall').that_comes_before('Class[galaxy::install]') }
-          it { is_expected.to contain_class('galaxy::install').that_comes_before('Class[galaxy::config]') }
+          it { is_expected.to contain_class('galaxy::install').that_comes_before('Class[galaxy::postinstall]') }
+          it { is_expected.to contain_class('galaxy::postinstall').that_comes_before('Class[galaxy::config]') }
           it { is_expected.to contain_class('galaxy::config') }
           it { is_expected.to contain_class('galaxy::service').that_subscribes_to('Class[galaxy::config]') }
 
@@ -59,6 +60,33 @@ describe 'galaxy' do
             'user'       => 'gxcode',
             'submodules' => 'false',
           ) }
+
+          it { is_expected.to contain_exec('install_pip_via_curl_to_get_latest').that_comes_before('Package[virtualenv]') }
+          it { is_expected.to contain_exec('install_pip_via_curl_to_get_latest').with(
+            'command' => '/bin/curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | /bin/python',
+            'creates' => '/bin/pip',
+          ) }
+
+          it { is_expected.to contain_package('virtualenv').that_comes_before('Exec[create_galaxy_virtualenv]') }
+          it { is_expected.to contain_package('virtualenv').with(
+            'ensure'   => 'present',
+            'provider' => 'pip',
+          ) }
+
+          it { is_expected.to contain_exec('create_galaxy_virtualenv').with(
+            'command' => '/bin/virtualenv -p python /opt/galaxy/server/.venv',
+            'user' => 'gxcode',
+            'creates' => '/opt/galaxy/server/.venv/bin/activate',
+          ) }
+
+          it { is_expected.to contain_exec('install_galaxy_virtualenv_wheels').that_subscribes_to('Exec[create_galaxy_virtualenv]') }
+          it { is_expected.to contain_exec('install_galaxy_virtualenv_wheels').with(
+            'command' => '/opt/galaxy/server/.venv/bin/pip --log /opt/galaxy/server/.venv/pip.log install --index-url https://wheels.galaxyproject.org/ -r /opt/galaxy/server/lib/galaxy/dependencies/pinned-requirements.txt',
+            'refreshonly' => 'true',
+            'timeout' => '0',
+            'user' => 'gxcode',
+            'cwd' => '/opt/galaxy/server/.venv',
+          ) }
         end
 
         context "galaxy class with galaxy_manage_git set to false" do
@@ -99,6 +127,8 @@ describe 'galaxy' do
             'require' => 'User[galaxy]',
           ) }
           it { is_expected.to contain_vcsrepo('/opt/galaxy/server').with_user('galaxy') }
+          it { is_expected.to contain_exec('create_galaxy_virtualenv').with_user('galaxy') }
+          it { is_expected.to contain_exec('install_galaxy_virtualenv_wheels').with_user('galaxy') }
         end
 
         context "galaxy class with galaxy_base_dir set to /srv/galaxy" do
@@ -151,6 +181,15 @@ describe 'galaxy' do
           it { is_expected.to contain_vcsrepo('/opt/galaxy/server').with_source('http://localhost/galaxy.git') }
         end
 
+        context "galaxy class with galaxy_wheels_repo_url set to http://localhost/" do
+          let(:params){
+            {
+              :galaxy_wheels_repo_url => 'http://localhost/',
+            }
+          }
+          it { is_expected.to contain_exec('install_galaxy_virtualenv_wheels').with_command('/opt/galaxy/server/.venv/bin/pip --log /opt/galaxy/server/.venv/pip.log install --index-url http://localhost/ -r /opt/galaxy/server/lib/galaxy/dependencies/pinned-requirements.txt') }
+        end
+
         context "galaxy class with galaxy_commit_id set to SHA 1 hash" do
           let(:params){
             {
@@ -158,6 +197,45 @@ describe 'galaxy' do
             }
           }
           it { is_expected.to contain_vcsrepo('/opt/galaxy/server').with_revision('9dca211e2fe59eaad1f7b95c8d51608b2afa05af') }
+        end
+
+        context "galaxy class with galaxy_manage_venv set to false" do
+          let(:params){
+            {
+              :galaxy_manage_venv => false,
+            }
+          }
+          it { is_expected.to_not contain_exec('install_pip_via_curl_to_get_latest') }
+          it { is_expected.to_not contain_package('virtualenv') }
+          it { is_expected.to_not contain_exec('create_galaxy_virtualenv') }
+          it { is_expected.to_not contain_exec('install_galaxy_virtualenv_wheels') }
+        end
+
+        context "galaxy class with galaxy_venv_dir set to /srv/galaxy/server/.venv" do
+          let(:params){
+            {
+              :galaxy_venv_dir => '/srv/galaxy/server/.venv',
+            }
+          }
+          it { is_expected.to contain_exec('create_galaxy_virtualenv').with(
+            'command' => '/bin/virtualenv -p python /srv/galaxy/server/.venv',
+            'creates' => '/srv/galaxy/server/.venv/bin/activate',
+          ) }
+          it { is_expected.to contain_exec('install_galaxy_virtualenv_wheels').with(
+            'command' => '/srv/galaxy/server/.venv/bin/pip --log /srv/galaxy/server/.venv/pip.log install --index-url https://wheels.galaxyproject.org/ -r /opt/galaxy/server/lib/galaxy/dependencies/pinned-requirements.txt',
+            'cwd'     => '/srv/galaxy/server/.venv'
+          ) }
+        end
+
+        context "galaxy class with galaxy_requirements_file set to /tmp/requirements.txt" do
+          let(:params){
+            {
+              :galaxy_requirements_file => '/tmp/requirements.txt',
+            }
+          }
+          it { is_expected.to contain_exec('install_galaxy_virtualenv_wheels').with(
+            'command' => '/opt/galaxy/server/.venv/bin/pip --log /opt/galaxy/server/.venv/pip.log install --index-url https://wheels.galaxyproject.org/ -r /tmp/requirements.txt',
+          ) }
         end
       end
     end

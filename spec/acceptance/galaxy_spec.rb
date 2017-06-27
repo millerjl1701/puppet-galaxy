@@ -54,5 +54,49 @@ describe 'galaxy class' do
       it { should be_owned_by 'gxcode' }
       it { should be_grouped_into 'gxcode' }
     end
+
+    describe file('/bin/pip') do
+      it { should exist }
+      it { should be_file }
+      it { should be_mode 755 }
+      it { should be_owned_by 'root' }
+      it { should be_grouped_into 'root' }
+    end
+
+    describe command('/bin/pip --version') do
+      its(:stdout) { should contain('pip 9') }
+    end
+
+    describe file('/bin/virtualenv') do
+      it { should exist }
+      it { should be_file }
+      it { should be_mode 755 }
+      it { should be_owned_by 'root' }
+      it { should be_grouped_into 'root' }
+    end
+
+    describe file('/opt/galaxy/server/.venv') do
+      it { should exist }
+      it { should be_directory }
+      it { should be_mode 755 }
+      it { should be_owned_by 'gxcode' }
+      it { should be_grouped_into 'gxcode' }
+    end
+
+    describe file('/opt/galaxy/server/.venv/bin/activate') do
+      it { should exist }
+      it { should be_file }
+      it { should be_mode 644 }
+      it { should be_owned_by 'gxcode' }
+      it { should be_grouped_into 'gxcode' }
+    end
+
+    describe file('/opt/galaxy/server/.venv/lib/python2.7/site-packages/pysam') do
+      it { should exist }
+      it { should be_directory }
+      it { should be_mode 755 }
+      it { should be_owned_by 'gxcode' }
+      it { should be_grouped_into 'gxcode' }
+    end
   end
 end

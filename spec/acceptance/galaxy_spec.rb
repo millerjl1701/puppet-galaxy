@@ -12,5 +12,19 @@ describe 'galaxy class' do
       apply_manifest(pp, :catch_failures => true)
       apply_manifest(pp, :catch_changes  => true)
     end
+
+    describe package('git') do
+      it { should be_installed }
+    end
+
+    describe user('gxcode') do
+      it { should exist }
+      it { should have_home_directory '/opt/galaxy' }
+    end
+
+    describe user('galaxy') do
+      it { should exist }
+      it { should have_home_directory '/var/opt/galaxy' }
+    end
   end
 end

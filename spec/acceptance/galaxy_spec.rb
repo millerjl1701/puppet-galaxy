@@ -26,5 +26,33 @@ describe 'galaxy class' do
       it { should exist }
       it { should have_home_directory '/var/opt/galaxy' }
     end
+
+    describe file('/opt/galaxy') do
+      it { should exist }
+      it { should be_directory }
+      it { should be_mode 755 }
+      it { should be_owned_by 'gxcode' }
+      it { should be_grouped_into 'gxcode' }
+    end
+
+    describe file('/var/opt/galaxy') do
+      it { should exist }
+      it { should be_directory }
+      it { should be_mode 755 }
+      it { should be_owned_by 'galaxy' }
+      it { should be_grouped_into 'galaxy' }
+    end
+
+    describe command('cd /opt/galaxy/server && git status') do
+      its(:stdout) { should contain('On branch release_17.05') }
+    end
+
+    describe file('/opt/galaxy/server/lib/galaxy') do
+      it { should exist }
+      it { should be_directory }
+      it { should be_mode 755 }
+      it { should be_owned_by 'gxcode' }
+      it { should be_grouped_into 'gxcode' }
+    end
   end
 end

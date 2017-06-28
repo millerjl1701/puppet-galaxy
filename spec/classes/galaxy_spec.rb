@@ -108,6 +108,20 @@ describe 'galaxy' do
             'group'  => 'root',
             'mode'   => '0644',
           ) }
+
+          it { is_expected.to contain_file('/var/opt/galaxy/config').with(
+            'ensure' => 'directory',
+            'owner'  => 'root',
+            'group'  => 'root',
+            'mode'   => '0755',
+          ) }
+
+          it { is_expected.to contain_file('/opt/galaxy/server/dependencies').with(
+            'ensure' => 'directory',
+            'owner'  => 'root',
+            'group'  => 'root',
+            'mode'   => '0755',
+          ) }
         end
 
         context "galaxy class with galaxy_manage_git set to false" do

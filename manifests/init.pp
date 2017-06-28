@@ -13,12 +13,14 @@
 # @param galaxy_manage_git [Boolean] Whether to manage the git package resource. Default value: true
 # @param galaxy_manage_static_setup [Boolean] Whether to manage the static configuration files for galaxy. Default: true
 # @param galaxy_manage_venv [Boolean] Whether to manage creation of the python 2.7 virtual environment for Galaxy. Default value: true
+# @param galaxy_mutable_config_dir [Stdlib::Absolutepath] Path to mutable galaxy configuration. Default: /var/opt/galaxy/config
 # @param galaxy_repo_url [String] URL of the Galaxy git repository to clone or download. Default: https://github.com/galaxyproject/galaxy.git
 # @param galaxy_requirements_file [Stdlib::Absolutepath] Path to the requirements file for pip. Default value: /opt/galaxy/server/lib/galaxy/dependencies/pinned-requirements.txt
 # @param galaxy_runtime_dir [Stdlib::Absolutepath] Directory for runtime files for the galaxy server. Default value: /var/opt/galaxy
 # @param galaxy_runtime_user [String] User account name that is the galaxy runtime user. Default value: galaxy
 # @param galaxy_server_dir [Stdlib::Absolutepath] Directory for the galaxy git repository code base to be cloned into. Default value: /opt/galaxy/server
 # @param galaxy_shed_tools_dir [Stdlib::Absolutepath] Directory for shed tools. Default; /opt/galaxy/shed_tools
+# @param galaxy_tool_dependency_dir [Stdlib::Absolutepath] Directory for tool dependencies. Defaults: /opt/galaxy/server/dependencies
 # @param galaxy_use_separate_users [Boolean] Whether to use separate user accounts for the galaxy code directory and the galaxy runtime. Default value: true
 # @param galaxy_venv_dir [Stdlib::Absolutepath] Directory where the galaxy python virtual environment lives. Default value: /opt/galaxy/server/.venv
 # @param galaxy_wheels_repo_url [String] URL of the Galaxy wheel repository. Default value: https://wheels.galaxyproject.org/

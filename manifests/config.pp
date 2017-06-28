@@ -26,6 +26,16 @@ class galaxy::config {
     # Collect Galaxy conditional dependency requirement strings similar to what is in tasks/dependencies.yml
 
     # Install Galaxy conditional dependencies similar to what is in tasks/dependencies.yml
-
   }
+
+  # mutable configurations
+  file { [ $::galaxy::galaxy_mutable_config_dir, $::galaxy::galaxy_tool_dependency_dir ]:
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+  }
+
+  # Instantiate mutable configuration files similar to what is in tasks/mutable_setup.yml
+
 }

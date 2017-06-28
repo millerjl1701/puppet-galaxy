@@ -75,17 +75,38 @@ describe 'galaxy' do
 
           it { is_expected.to contain_exec('create_galaxy_virtualenv').with(
             'command' => '/bin/virtualenv -p python /opt/galaxy/server/.venv',
-            'user' => 'gxcode',
+            'user'    => 'gxcode',
             'creates' => '/opt/galaxy/server/.venv/bin/activate',
           ) }
 
           it { is_expected.to contain_exec('install_galaxy_virtualenv_wheels').that_subscribes_to('Exec[create_galaxy_virtualenv]') }
           it { is_expected.to contain_exec('install_galaxy_virtualenv_wheels').with(
-            'command' => '/opt/galaxy/server/.venv/bin/pip --log /opt/galaxy/server/.venv/pip.log install --index-url https://wheels.galaxyproject.org/ -r /opt/galaxy/server/lib/galaxy/dependencies/pinned-requirements.txt',
+            'command'     => '/opt/galaxy/server/.venv/bin/pip --log /opt/galaxy/server/.venv/pip.log install --index-url https://wheels.galaxyproject.org/ -r /opt/galaxy/server/lib/galaxy/dependencies/pinned-requirements.txt',
             'refreshonly' => 'true',
-            'timeout' => '0',
-            'user' => 'gxcode',
-            'cwd' => '/opt/galaxy/server/.venv',
+            'timeout'     => '0',
+            'user'        => 'gxcode',
+            'cwd'         => '/opt/galaxy/server/.venv',
+          ) }
+
+          it { is_expected.to contain_file('/opt/galaxy/config').with(
+            'ensure' => 'directory',
+            'owner'  => 'root',
+            'group'  => 'root',
+            'mode'   => '0755',
+          ) }
+
+          it { is_expected.to contain_file('/opt/galaxy/shed_tools').with(
+            'ensure' => 'directory',
+            'owner'  => 'root',
+            'group'  => 'root',
+            'mode'   => '0755',
+          ) }
+
+          it { is_expected.to contain_file('/opt/galaxy/config/galaxy.ini').with(
+            'ensure' => 'present',
+            'owner'  => 'root',
+            'group'  => 'root',
+            'mode'   => '0644',
           ) }
         end
 
@@ -270,6 +291,16 @@ describe 'galaxy' do
             'creates' => '/opt/galaxy/server/release_17.05_receipt',
             'user'    => 'gxcode',
           ) }
+        end
+        context "galaxy class with galaxy_manage_static_setup set to false" do
+          let(:params){
+            {
+              :galaxy_manage_static_setup    => false,
+            }
+          }
+          it { is_expected.to_not contain_file('/opt/galaxy/config') }
+          it { is_expected.to_not contain_file('/opt/galaxy/shed_tools') }
+          it { is_expected.to_not contain_file('/opt/galaxy/config.galaxy.ini') }
         end
       end
     end

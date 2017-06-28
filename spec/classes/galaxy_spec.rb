@@ -237,6 +237,40 @@ describe 'galaxy' do
             'command' => '/opt/galaxy/server/.venv/bin/pip --log /opt/galaxy/server/.venv/pip.log install --index-url https://wheels.galaxyproject.org/ -r /tmp/requirements.txt',
           ) }
         end
+
+        context "galaxy class with both galaxy_manage_clone and galaxy_manage_download set to true" do
+          let(:params){
+            {
+              :galaxy_manage_clone    => true,
+              :galaxy_manage_download => true,
+            }
+          }
+          it { expect { is_expected.to contain_package('galaxy') }.to raise_error(Puppet::Error, /Error: Both galaxy_manage_clone and galaxy_manage_download were set to true./) }
+        end
+
+        context "galaxy class with both galaxy_manage_clone and galaxy_manage_download set to false" do
+          let(:params){
+            {
+              :galaxy_manage_clone    => false,
+              :galaxy_manage_download => false,
+            }
+          }
+          it { expect { is_expected.to contain_package('galaxy') }.to raise_error(Puppet::Error, /Error: Neither galaxy_manage_clone nor galaxy_manage_download were set to true./) }
+        end
+        context "galaxy class with galaxy_manage_download set to true and galaxy_manage_clone set to false" do
+          let(:params){
+            {
+              :galaxy_manage_clone    => false,
+              :galaxy_manage_download => true,
+            }
+          }
+          it { is_expected.to_not contain_vscrepo('/opt/galaxy/server') }
+          it { is_expected.to contain_exec('install_galaxy_via_download').with(
+            'command' => 'rm -rf /opt/galaxy/server && mkdir /opt/galaxy/server && wget -q -O - https://github.com/galaxyproject/galaxy.git/get/release_17.05.tar.gz | tar xzf - --strip-components=1 -C /opt/galaxy/server && touch /opt/galaxy/server/release_17.05_receipt',
+            'creates' => '/opt/galaxy/server/release_17.05_receipt',
+            'user'    => 'gxcode',
+          ) }
+        end
       end
     end
   end
